@@ -1,175 +1,164 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LunarLink — Mission Control</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LunarLink — Crater Correspondence Tool</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <header>
-    <div class="header-left">
-      <div class="title-group">
-        <span class="title-main">LunarLink</span>
-        <span class="title-separator">—</span>
-        <span class="title-sub">Multi-Modal Crater Correspondence Engine</span>
-      </div>
-      <div class="badge-group">
-        <span class="badge">OHRC</span>
-        <span class="badge">TMC-2</span>
-        <span class="badge">IIRS</span>
-      </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <button id="leftToggle">☰</button>
+      <b>◐ LunarLink</b>
+      <span>Crater Correspondence Tool</span>
     </div>
-    <div class="status-panel"><span class="status-dot"></span><span class="status-text">System Ready</span></div>
+
+    <label class="incoming-upload">
+      Incoming Image (ISRO Feed)
+      <input id="incomingInput" type="file" accept="image/*">
+      <span id="incomingName">Demo incoming image</span>
+    </label>
+
+    <div class="actions">
+      <span id="searchStatus"></span>
+      <button id="runAnalysis">Run Analysis</button>
+      <button id="rightToggle">ⓘ</button>
+    </div>
   </header>
 
-  <main>
-    <section class="content-section">
-      <h2 class="section-title">Select Image Pair</h2>
-      <div class="instrument-control">
-        <label for="instrument">Instrument</label>
-        <select id="instrument">
-          <option value="OHRC">OHRC</option>
-          <option value="TMC-2">TMC-2</option>
-          <option value="IIRS">IIRS</option>
-        </select>
-      </div>
 
-      <div class="upload-grid">
-        <div class="image-upload-panel">
-          <div class="upload-box" id="uploadBoxA">
-            <input type="file" id="imageAInput" accept="image/*" hidden>
-            <div class="upload-icon">↑</div>
-            <div class="upload-title">Image A</div>
-            <div class="upload-text">Drag and drop reference image or click to browse</div>
-            <div class="file-name" id="fileNameA">Demo lunar reference surface</div>
-          </div>
+  <div class="shell">
 
-          <div class="metadata-loading" id="metadataLoadingA"><span class="metadata-spinner"></span>Extracting metadata...</div>
+    <!-- LEFT SIDEBAR -->
+    <aside class="left-sidebar" id="leftSidebar">
+      <section>
+        <h2>Data Layers</h2>
 
-          <div class="metadata-card" id="metadataCardA">
-            <div class="metadata-card-header">
-              <span>Auto-Extracted Metadata</span>
-              <span class="info-tooltip" tabindex="0">i<span class="tooltip-text">Derived from image header + photometric analysis — no manual input required</span></span>
-            </div>
-            <dl class="metadata-list">
-              <div><dt>Sun Elevation</dt><dd id="sunElevationA">—</dd></div>
-              <div><dt>Sun Azimuth</dt><dd id="sunAzimuthA">—</dd></div>
-              <div><dt>Ground Resolution</dt><dd id="resolutionA">—</dd></div>
-              <div><dt>Spectral Band</dt><dd id="spectralBandA">—</dd></div>
-              <div><dt>Viewing Angle</dt><dd id="viewingAngleA">—</dd></div>
-            </dl>
-          </div>
-        </div>
-
-        <div class="image-upload-panel">
-          <div class="upload-box" id="uploadBoxB">
-            <input type="file" id="imageBInput" accept="image/*" hidden>
-            <div class="upload-icon">↑</div>
-            <div class="upload-title">Image B</div>
-            <div class="upload-text">Drag and drop candidate image or click to browse</div>
-            <div class="file-name" id="fileNameB">Demo lunar candidate surface</div>
-          </div>
-
-          <div class="metadata-loading" id="metadataLoadingB"><span class="metadata-spinner"></span>Extracting metadata...</div>
-
-          <div class="metadata-card" id="metadataCardB">
-            <div class="metadata-card-header">
-              <span>Auto-Extracted Metadata</span>
-              <span class="info-tooltip" tabindex="0">i<span class="tooltip-text">Derived from image header + photometric analysis — no manual input required</span></span>
-            </div>
-            <dl class="metadata-list">
-              <div><dt>Sun Elevation</dt><dd id="sunElevationB">—</dd></div>
-              <div><dt>Sun Azimuth</dt><dd id="sunAzimuthB">—</dd></div>
-              <div><dt>Ground Resolution</dt><dd id="resolutionB">—</dd></div>
-              <div><dt>Spectral Band</dt><dd id="spectralBandB">—</dd></div>
-              <div><dt>Viewing Angle</dt><dd id="viewingAngleB">—</dd></div>
-            </dl>
-          </div>
-        </div>
-      </div>
-
-      <button class="run-button" id="runAnalysis" type="button">Run Correspondence Analysis</button>
-    </section>
-
-    <section class="content-section">
-      <h2 class="section-title">Processing Pipeline</h2>
-      <div class="pipeline">
-        <div class="pipeline-line"></div>
-        <div class="pipeline-step"><div class="step-icon">◌</div><div class="step-label">Ingest</div><div class="step-description">Load image pair</div></div>
-        <div class="pipeline-step"><div class="step-icon">◫</div><div class="step-label">Normalize</div><div class="step-description">Relight from metadata</div></div>
-        <div class="pipeline-step"><div class="step-icon">⌾</div><div class="step-label">Detect</div><div class="step-description">Identify craters</div></div>
-        <div class="pipeline-step"><div class="step-icon">⌁</div><div class="step-label">Describe</div><div class="step-description">Extract features</div></div>
-        <div class="pipeline-step"><div class="step-icon">⇄</div><div class="step-label">Match</div><div class="step-description">Pair correspondences</div></div>
-        <div class="pipeline-step"><div class="step-icon">✓</div><div class="step-label">Validate</div><div class="step-description">Verify geometry</div></div>
-      </div>
-    </section>
-
-    <section class="content-section results-section" id="resultsSection">
-      <div class="results-header">
-        <h2 class="section-title">Results</h2>
-        <label class="toggle-control">
-          <span>Illumination Normalization</span>
-          <input type="checkbox" id="normalizationToggle">
-          <span class="toggle-switch"><span class="toggle-knob"></span></span>
+        <label>
+          <input id="showCraters" type="checkbox" checked>
+          Show Detected Craters
         </label>
-      </div>
 
-      <div class="results-stage" id="resultsStage">
-        <div class="result-canvas-wrap">
-          <div class="canvas-frame"><canvas id="canvasA" width="500" height="500"></canvas></div>
-          <div class="canvas-label">Image A — Reference</div>
+        <label>
+          <input id="showTiePoints" type="checkbox" checked>
+          Show Tie Points
+        </label>
+
+        <label>
+          <input id="showOutliers" type="checkbox" checked>
+          Show Outliers
+        </label>
+
+        <label>
+          <input id="normalizationToggle" type="checkbox">
+          Illumination Normalization
+        </label>
+      </section>
+
+      <section>
+        <h2>Auto-Extracted Metadata</h2>
+        <div id="metadata" class="metadata">
+          Awaiting analysis
         </div>
-        <div class="result-canvas-wrap">
-          <div class="canvas-frame"><canvas id="canvasB" width="500" height="500"></canvas></div>
-          <div class="canvas-label">Image B — Candidate</div>
+      </section>
+    </aside>
+
+
+    <!-- MAIN MAP -->
+    <main class="map" id="map">
+      <div class="split">
+
+        <section class="pane" id="referencePane">
+          <div class="pane-title">MATCHED REFERENCE</div>
+          <div id="referenceWarning" class="warning-badge hidden">⚠ Low detail — results may be less accurate</div>
+          <div class="content" id="referenceContent">
+            <canvas id="referenceCanvas" width="500" height="500"></canvas>
+            <svg id="referenceMarks"></svg>
+          </div>
+        </section>
+
+        <section class="pane" id="incomingPane">
+          <div class="pane-title">INCOMING IMAGE</div>
+          <div id="incomingWarning" class="warning-badge hidden">⚠ Low detail — results may be less accurate</div>
+          <div class="content" id="incomingContent">
+            <canvas id="incomingCanvas" width="500" height="500"></canvas>
+            <svg id="incomingMarks"></svg>
+          </div>
+        </section>
+
+      </div>
+
+      <svg id="lines"></svg>
+
+      <div class="scale">
+        — 50 m · <span id="zoom">100%</span>
+      </div>
+
+      <div class="coords" id="coords">
+        X: — Y: —
+      </div>
+    </main>
+
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="right-sidebar" id="rightSidebar">
+      <section>
+        <h2>Match Result</h2>
+        <div class="result-card" id="matchResult">
+          Upload an incoming image, then run analysis.
         </div>
-        <div class="scan-line" id="scanLine"></div>
-        <svg class="correspondence-overlay" id="correspondenceOverlay" aria-hidden="true"></svg>
-        <div class="match-tooltip" id="matchTooltip"></div>
-      </div>
-    </section>
+      </section>
 
-    <section class="content-section insights-section" id="accuracySection">
-      <h2 class="section-title">Tie Point Accuracy Report</h2>
+      <section>
+        <h2>Tie Point Accuracy Report</h2>
+        <div class="summary" id="summary">
+          No analysis run.
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Reference</th>
+                <th>Incoming</th>
+                <th>Residual</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="report"></tbody>
+          </table>
+        </div>
+      </section>
 
-      <div class="accuracy-summary">
-        <div class="summary-stat"><span>Total Tie Points</span><strong>9</strong></div>
-        <div class="summary-stat"><span>RANSAC Inliers</span><strong class="inlier-text">6</strong></div>
-        <div class="summary-stat"><span>Outliers Rejected</span><strong class="outlier-text">3</strong></div>
-        <div class="summary-stat"><span>RMSE</span><strong>2.9 px <em>(3.8 m)</em></strong></div>
-        <div class="summary-stat"><span>Mean Reprojection Error</span><strong>1.4 px</strong></div>
-      </div>
+      <section>
+        <h2>Mission Metrics</h2>
+        <div class="metrics">
+          <div>
+            Craters Detected
+            <b id="metricCraters">0</b>
+          </div>
+          <div>
+            Matches Found
+            <b id="metricMatches">0</b>
+          </div>
+          <div>
+            Mean Alignment Error
+            <b id="metricError">—</b>
+          </div>
+          <div>
+            Processing Time
+            <b>1.2s</b>
+          </div>
+        </div>
+      </section>
+    </aside>
 
-      <div class="accuracy-table-wrap">
-        <table class="accuracy-table">
-          <thead>
-            <tr>
-              <th>Tie Point ID</th>
-              <th>Image A Coordinates</th>
-              <th>Image B Coordinates</th>
-              <th>Estimated Lunar Coordinates</th>
-              <th>Residual (pixels)</th>
-              <th>Residual (meters)</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="accuracyTableBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="content-section insights-section" id="metricsSection">
-      <h2 class="section-title">Mission Metrics</h2>
-      <div class="metrics-grid">
-        <article class="metric-card"><span class="metric-icon">◌</span><strong class="metric-value" data-target="9" data-decimals="0">0</strong><span class="metric-label">Craters Detected</span></article>
-        <article class="metric-card"><span class="metric-icon">⇄</span><strong class="metric-value" data-target="6" data-decimals="0">0</strong><span class="metric-label">Matches Found</span></article>
-        <article class="metric-card"><span class="metric-icon">⌖</span><strong class="metric-value" data-target="3.8" data-decimals="1" data-suffix="m">0m</strong><span class="metric-label">Mean Alignment Error</span></article>
-        <article class="metric-card"><span class="metric-icon">◷</span><strong class="metric-value" data-target="1.2" data-decimals="1" data-suffix="s">0s</strong><span class="metric-label">Processing Time</span></article>
-      </div>
-    </section>
-  </main>
+  </div>
 
   <script src="script.js"></script>
+
 </body>
 </html>
